@@ -55,4 +55,11 @@ function serve(req, res) {
   res.writeHead(200, {'Content-Type': type}); fs.createReadStream(target).pipe(res);
 }
 if (!state.task) nextRound();
-http.createServer((req,res) => serve(req,res).catch(() => sendJson(res,{error:'Bad request'},400))).listen(PORT, () => console.log(`Classroom dashboard running on port ${PORT}`));
+http.createServer((req, res) => {
+  Promise.resolve()
+    .then(() => serve(req, res))
+    .catch(() => {
+      if (!res.headersSent) sendJson(res, {error: 'Bad request'}, 400);
+      else res.end();
+    });
+}).listen(PORT, () => console.log(`Classroom dashboard running on port ${PORT}`));
